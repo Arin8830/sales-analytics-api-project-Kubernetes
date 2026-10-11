@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: salesdb
+      POSTGRES_USER: salesuser
+      POSTGRES_PASSWORD: local_dev_password
+    volumes:
+      - sales_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_NAME: salesdb
+      DB_USER: salesuser
+      DB_PASSWORD: local_dev_password
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+        
+
+volumes:
+  sales_data:
