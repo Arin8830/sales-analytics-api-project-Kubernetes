@@ -27,7 +27,10 @@ spec:
             - name: DB_USER
               value: salesuser
             - name: DB_PASSWORD
-              value: local_dev_password
+              valueFrom:
+                secretKeyRef:
+                  name: sales-db-secret
+                  key: DB_PASSWORD
           resources:
             requests:
               cpu: 100m
